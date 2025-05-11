@@ -1,0 +1,360 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>حاسبة أسعار بوابات الأوفرهيد</title>
+    <link href="https://fonts.googleapis.com/css2?family=Tajawal:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        * {
+            font-family: 'Tajawal', sans-serif;
+            box-sizing: border-box;
+        }
+        body {
+            background: #f5f5f5;
+            margin: 0;
+            padding: 20px;
+        }
+        .container {
+            max-width: 800px;
+            margin: 0 auto;
+            background: white;
+            padding: 30px;
+            border-radius: 15px;
+            box-shadow: 0 0 20px rgba(0,0,0,0.1);
+        }
+        .header {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        .logo {
+            max-width: 200px;
+            margin-bottom: 15px;
+        }
+        .section {
+            margin-bottom: 30px;
+            padding: 20px;
+            border: 1px solid #eee;
+            border-radius: 10px;
+        }
+        .form-group {
+            margin-bottom: 20px;
+        }
+        label {
+            display: block;
+            margin-bottom: 8px;
+            color: #34495e;
+            font-weight: 600;
+        }
+        select, input {
+            width: 100%;
+            padding: 12px;
+            border: 2px solid #3498db;
+            border-radius: 8px;
+            font-size: 16px;
+        }
+        .dimension-note {
+            font-size: 13px;
+            color: #7f8c8d;
+            margin-top: 5px;
+            font-style: italic;
+        }
+        .price-range {
+            font-size: 24px;
+            color: #27ae60;
+            font-weight: 700;
+            margin: 15px 0;
+        }
+        .button-group {
+            text-align: center;
+            margin-top: 30px;
+        }
+        button {
+            padding: 15px 35px;
+            margin: 10px;
+            border: none;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 16px;
+            transition: 0.3s;
+        }
+        .calculate-btn {
+            background: #3498db;
+            color: white;
+        }
+        .whatsapp-btn {
+            background: #25D366;
+            color: white;
+        }
+        .notes {
+            color: #7f8c8d;
+            font-size: 14px;
+            margin-top: 20px;
+            line-height: 1.6;
+        }
+        .hidden {
+            display: none;
+        }
+        .color-note {
+            color: #e74c3c;
+            font-weight: bold;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <img src="https://raw.githubusercontent.com/radma-om/radma/main/radma-logo.png" alt="شعار ردما" class="logo">
+            <h1>حاسبة أسعار بوابات الأوفرهيد</h1>
+            <p>علامة تجارية عُمانية 100% بإدارة عُمانية 100%</p>
+        </div>
+
+        <!-- بيانات العميل -->
+        <div class="section">
+            <h2><i class="fas fa-user"></i> بيانات العميل</h2>
+            <div class="form-group">
+                <label><i class="fas fa-signature"></i> اسم العميل:</label>
+                <input type="text" id="clientName" required>
+            </div>
+            <div class="form-group">
+                <label><i class="fas fa-mobile-alt"></i> رقم الجوال:</label>
+                <input type="tel" id="phone" required>
+            </div>
+            <div class="form-group">
+                <label><i class="fas fa-map-marker-alt"></i> المحافظة:</label>
+                <select id="governorate" onchange="updateStates()">
+                    <option value="">اختر المحافظة</option>
+                    <option value="مسقط">مسقط</option>
+                    <option value="الداخلية">الداخلية</option>
+                    <option value="شمال الشرقية">شمال الشرقية</option>
+                    <option value="جنوب الباطنة">جنوب الباطنة</option>
+                    <option value="الظاهرة">الظاهرة</option>
+                </select>
+            </div>
+            <div class="form-group">
+                <label><i class="fas fa-city"></i> الولاية:</label>
+                <select id="state" onchange="calculateTotal()"></select>
+            </div>
+        </div>
+
+        <!-- مواصفات البوابة -->
+        <div class="section">
+            <h2><i class="fas fa-gate"></i> مواصفات البوابة</h2>
+            <div class="form-group">
+                <label><i class="fas fa-tags"></i> النوع:</label>
+                <select id="gateType" onchange="showDimensions()">
+                    <option value="">اختر النوع</option>
+                    <option value="A">Type A</option>
+                    <option value="B">Type B</option>
+                </select>
+            </div>
+            
+            <div class="form-group hidden" id="dimensionsGroup">
+                <label><i class="fas fa-ruler-combined"></i> الأبعاد:</label>
+                <select id="width" onchange="calculateTotal()"></select>
+                <select id="height" onchange="calculateTotal()" class="hidden"></select>
+                <div class="dimension-note">يتم اختيار العرض والارتفاع وفقاً للمقاس الأقرب والأكبر من المقاس الفعلي</div>
+            </div>
+        </div>
+
+        <!-- نوع المحرك -->
+        <div class="section">
+            <h2><i class="fas fa-cogs"></i> نوع المحرك</h2>
+            <div class="form-group">
+                <select id="motor" onchange="calculateTotal()">
+                    <option value="">اختر المحرك</option>
+                    <option value="120N"><i class="fas fa-engine"></i> المكينة الإيطالية 120N (145 ريال)</option>
+                    <option value="100N"><i class="fas fa-engine"></i> المكينة الإيطالية 100N (135 ريال)</option>
+                    <option value="صينية"><i class="fas fa-engine"></i> المكينة الصينية (115 ريال)</option>
+                </select>
+            </div>
+        </div>
+
+        <!-- النتائج -->
+        <div class="button-group">
+            <button class="calculate-btn" onclick="calculateTotal()">
+                <i class="fas fa-calculator"></i> احتساب السعر
+            </button>
+            <button class="whatsapp-btn" onclick="sendWhatsApp()">
+                <i class="fab fa-whatsapp"></i> طلب عرض أسعار
+            </button>
+        </div>
+
+        <div class="price-box hidden" id="priceBox">
+            <div>السعر الإجمالي:</div>
+            <div class="price-range" id="priceRange">0 - 0 ريال عماني</div>
+            <div class="color-note">إختلاف الأسعار معتمداً على اللون</div>
+            <div class="notes">
+                <i class="fas fa-info-circle"></i> الأسعار تشمل التركيب والملحقات الأساسية<br>
+                <i class="fas fa-exclamation-triangle"></i> الأسعار ابتدائية وقد تختلف حسب طبيعة العمل<br>
+                <i class="fas fa-shield-alt"></i> الضمان يشمل عيوب التصنيع لمدة 5 سنوات
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const prices = {
+            A: {
+                250: {415: [325, 355], 455: [335, 370], 615: [440, 470]},
+                300: {415: [365, 395], 455: [405, 440], 615: [530, 560]}
+            },
+            B: {
+                250: {370: [290, 330], 440: [310, 355], 550: [350, 395], 600: [380, 425]}
+            },
+            motor: {"120N": 145, "100N": 135, "صينية": 115},
+            installation: {
+                "الداخلية": {
+                    "نزوى": 80, "بهلاء": 90, "الحمراء": 90, "أدم": 100,
+                    "إزكي": 90, "منح": 90, "سمائل": 100, "بدبد": 100, "الجبل الأخضر": 140
+                },
+                "مسقط": {
+                    "مسقط": 110, "السيب": 100, "بوشر": 100, "مطرح": 100, "العامرات": 110
+                },
+                "جنوب الباطنة": {
+                    "المصنعة": 120, "بركاء": 110
+                },
+                "شمال الشرقية": {
+                    "إبراء": 110, "المضيبي": 110, "دماء والطائيين": 110, "سناو": 110
+                },
+                "الظاهرة": {
+                    "عبري": 115
+                }
+            }
+        };
+
+        function updateStates() {
+            const governorate = document.getElementById('governorate').value;
+            const stateSelect = document.getElementById('state');
+            stateSelect.innerHTML = '<option value="">اختر الولاية</option>';
+            
+            if (governorate && prices.installation[governorate]) {
+                Object.keys(prices.installation[governorate]).forEach(state => {
+                    const option = document.createElement('option');
+                    option.value = state;
+                    option.textContent = state;
+                    stateSelect.appendChild(option);
+                });
+            }
+            calculateTotal();
+        }
+
+        function showDimensions() {
+            const type = document.getElementById('gateType').value;
+            const widthSelect = document.getElementById('width');
+            const heightSelect = document.getElementById('height');
+            
+            widthSelect.innerHTML = '<option value="">اختر العرض</option>';
+            heightSelect.innerHTML = '<option value="">اختر الارتفاع</option>';
+            
+            if (type === 'A') {
+                ['415', '455', '615'].forEach(w => {
+                    const option = document.createElement('option');
+                    option.value = w;
+                    option.textContent = w + ' سم';
+                    widthSelect.appendChild(option);
+                });
+                heightSelect.classList.remove('hidden');
+                ['250', '300'].forEach(h => {
+                    const option = document.createElement('option');
+                    option.value = h;
+                    option.textContent = h + ' سم';
+                    heightSelect.appendChild(option);
+                });
+            } else if (type === 'B') {
+                ['370', '440', '550', '600'].forEach(w => {
+                    const option = document.createElement('option');
+                    option.value = w;
+                    option.textContent = w + ' سم';
+                    widthSelect.appendChild(option);
+                });
+                heightSelect.classList.add('hidden');
+            }
+            document.getElementById('dimensionsGroup').classList.remove('hidden');
+            calculateTotal();
+        }
+
+        function calculateTotal() {
+            let minTotal = 0;
+            let maxTotal = 0;
+            
+            // حساب سعر البوابة
+            const type = document.getElementById('gateType').value;
+            const width = document.getElementById('width').value;
+            const height = document.getElementById('height').value || '250';
+            
+            if (type && width) {
+                const priceRange = prices[type][height][width];
+                if (priceRange) {
+                    minTotal += priceRange[0];
+                    maxTotal += priceRange[1];
+                }
+            }
+
+            // إضافة سعر المحرك
+            const motor = document.getElementById('motor').value;
+            if (motor) {
+                const motorPrice = prices.motor[motor];
+                minTotal += motorPrice;
+                maxTotal += motorPrice;
+            }
+
+            // إضافة سعر التركيب
+            const governorate = document.getElementById('governorate').value;
+            const state = document.getElementById('state').value;
+            if (governorate && state) {
+                const installPrice = prices.installation[governorate][state];
+                minTotal += installPrice;
+                maxTotal += installPrice;
+            }
+
+            // عرض النتيجة
+            const priceBox = document.getElementById('priceBox');
+            const priceRange = document.getElementById('priceRange');
+            if (minTotal > 0) {
+                priceBox.classList.remove('hidden');
+                priceRange.textContent = minTotal + ' - ' + maxTotal + ' ريال عماني';
+            } else {
+                priceBox.classList.add('hidden');
+            }
+        }
+
+        function sendWhatsApp() {
+            const phone = "+96890660002";
+            const name = document.getElementById('clientName').value || 'غير محدد';
+            const phoneNum = document.getElementById('phone').value || 'غير محدد';
+            const governorate = document.getElementById('governorate').value || 'غير محدد';
+            const state = document.getElementById('state').value || 'غير محدد';
+            const gateType = document.getElementById('gateType').value ? 'Type ' + document.getElementById('gateType').value : 'غير محدد';
+            const width = document.getElementById('width').value || 'غير محدد';
+            const height = document.getElementById('height').value || '250';
+            const motor = document.getElementById('motor').value || 'غير محدد';
+            const price = document.getElementById('priceRange').textContent || 'غير محدد';
+
+            const message = `✨ *عرض سعر بوابة أوفرهيد - ردما* ✨
+
+*🔹 بيانات العميل:*
+🏷️ الاسم: ${name}
+📱 الجوال: ${phoneNum}
+📍 الموقع: ${governorate} - ${state}
+
+*🔹 مواصفات البوابة:*
+🚪 النوع: ${gateType}
+📏 الأبعاد: ${width} سم عرض × ${height} سم ارتفاع
+⚙️ المحرك: ${motor}
+
+*💰 السعر المقدر:*
+💵 ${price}
+
+*ملاحظات:*
+• الأسعار تشمل التركيب والملحقات
+• الأسعار قد تختلف حسب اللون والمواصفات الإضافية
+• الضمان 5 سنوات ضد عيوب التصنيع
+
+📞 للاستفسار أو التأكيد، يرجى التواصل مع فريق خدمة العملاء`;
+
+            window.open(`https://wa.me/${phone}?text=${encodeURIComponent(message)}`, '_blank');
+        }
+    </script>
+</body>
+</html>
